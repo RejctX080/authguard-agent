@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthGuard Agent v1.0 (Prototype)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0c29;
+            min-height: 100vh;
+        }
+
+        /* ── TOP NAV ── */
+        .top-nav {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 0;
+        }
+
+        .nav-brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .nav-brand-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .nav-brand-sub {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-tab {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        /* ── PAGES ── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── EHR PAGE ── */
+        .ehr-bg {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: calc(100vh - 65px);
+            padding: 2.5rem 2rem;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-sub {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .form-group label {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .form-group select option { background: #302b63; color: white; }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(102,126,234,0.1);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+        }
+
+        .form-group textarea {
+            min-height: 280px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.88rem;
+            line-height: 1.7;
+            resize: vertical;
+        }
+
+        /* Scenario pills */
+        .scenario-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .scenario-pill {
+            padding: 0.5rem 1.1rem;
+            border-radius: 50px;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scenario-pill:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .pill-green { background: #065f46; color: #6ee7b7; border: 1px solid #10b981; }
+        .pill-yellow { background: #78350f; color: #fde68a; border: 1px solid #f59e0b; }
+        .pill-red { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+
+        /* Big analyze button */
+        .analyze-btn {
+            width: 100%;
+            padding: 1.1rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102,126,234,0.55);
+        }
+
+        /* ── AUTHGUARD PAGE ── */
+        .ag-bg {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: calc(100vh - 65px);
+            padding: 2.5rem 2rem;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-box {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .payer-alert {
+            background: rgba(239,68,68,0.15);
+            border: 2px solid rgba(239,68,68,0.5);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .payer-alert h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fca5a5;
+        }
+
+        .req-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .req-section h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .req-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+        }
+
+        /* What If Simulator */
+        .whatif-card {
+            background: rgba(102,126,234,0.1);
+            border: 1px solid rgba(102,126,234,0.35);
+            border-radius: 14px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .whatif-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .whatif-subtitle {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 1.25rem;
+        }
+
+        .whatif-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            background: rgba(255,255,255,0.07);
+            border-radius: 10px;
+            margin-bottom: 0.6rem;
+        }
+
+        .whatif-text { flex: 1; font-size: 0.88rem; line-height: 1.5; }
+        .whatif-text strong { display: block; margin-bottom: 0.2rem; }
+
+        .gain-badge {
+            background: rgba(16,185,129,0.2);
+            border: 1px solid #10b981;
+            color: #6ee7b7;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .whatif-final {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.4);
+            border-radius: 10px;
+            margin-top: 0.75rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .prob-pill {
+            padding: 0.3rem 0.85rem;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .prob-before { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; }
+        .prob-after { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #6ee7b7; }
+
+        /* Action buttons */
+        .action-btn {
+            width: 100%;
+            padding: 1.1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .action-btn:hover { transform: translateY(-2px); }
+        .btn-submit { background: linear-gradient(135deg, #059669, #10b981); color: white; box-shadow: 0 6px 20px rgba(16,185,129,0.35); }
+        .btn-review { background: linear-gradient(135deg, #d97706, #f59e0b); color: white; box-shadow: 0 6px 20px rgba(245,158,11,0.35); }
+        .btn-reject { background: linear-gradient(135deg, #dc2626, #ef4444); color: white; box-shadow: 0 6px 20px rgba(239,68,68,0.35); }
+
+        /* Appeal section */
+        .appeal-card {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 14px;
+            padding: 1.75rem;
+            margin-top: 1rem;
+            color: white;
+        }
+
+        .appeal-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .appeal-card p { font-size: 0.88rem; color: rgba(255,255,255,0.65); margin-bottom: 1rem; }
+
+        .appeal-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            background: rgba(239,68,68,0.2);
+            border: 1px solid rgba(239,68,68,0.5);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .appeal-btn:hover { background: rgba(239,68,68,0.35); transform: translateY(-2px); }
+
+        .appeal-letter {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            font-size: 0.82rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            font-family: 'Georgia', serif;
+            color: rgba(255,255,255,0.85);
+            display: none;
+        }
+
+        .appeal-letter.show { display: block; animation: fadeUp 0.4s ease; }
+
+        .copy-btn {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.5rem 1.1rem;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Loading spinner */
+        .loading-wrap { text-align: center; padding: 3rem; color: white; }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .status-msg {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 2.5rem;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-row { grid-template-columns: 1fr; }
+            .nav-tabs { gap: 0.1rem; }
+            .nav-tab { padding: 0.5rem 1rem; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NAV -->
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <div class="nav-brand-icon">🛡️</div>
+            <div>
+                <div class="nav-brand-text">AuthGuard Agent v1.0</div>
+                <div class="nav-brand-sub">Prototype</div>
+            </div>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchPage('ehr', this)">🏥 EHR Entry</button>
+            <button class="nav-tab" onclick="switchPage('authguard', this)">🛡️ AuthGuard Analysis</button>
+        </div>
+    </nav>
+
+    <!-- ════════════════ EHR PAGE ════════════════ -->
+    <div id="page-ehr" class="page active">
+        <div class="ehr-bg">
+            <div style="max-width:1100px; margin:0 auto;">
+                <h1 class="page-title">Patient Documentation</h1>
+                <p class="page-sub">Enter patient details and clinical notes, then run AuthGuard analysis</p>
+
+                <!-- Scenarios -->
+                <div class="glass-card">
+                    <div class="section-label">Quick Load Scenarios</div>
+                    <div class="scenario-row">
+                        <button class="scenario-pill pill-green" onclick="loadScenario('s1')">✅ Perfect Docs (BCBS) ~95%</button>
+                        <button class="scenario-pill pill-yellow" onclick="loadScenario('s2')">⚠️ Borderline (BCBS) ~68%</button>
+                        <button class="scenario-pill pill-red" onclick="loadScenario('s3')">❌ Incomplete ~35%</button>
+                        <button class="scenario-pill pill-green" onclick="loadScenario('s4')">✅ Cardiac Emergency (UHC) ~92%</button>
+                        <button class="scenario-pill pill-red" onclick="loadScenario('s5')">❌ UHC Wrong Facility ~5%</button>
+                    </div>
+                </div>
+
+                <!-- Patient Info -->
+                <div class="glass-card">
+                    <div class="section-label">Patient Demographics</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" id="firstName" placeholder="John">
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" id="lastName" placeholder="Smith">
+                        </div>
+                        <div class="form-group">
+                            <label>Insurance Provider *</label>
+                            <select id="insurance">
+                                <option value="">Select...</option>
+                                <option value="bcbs">Blue Cross Blue Shield</option>
+                                <option value="uhc">UnitedHealthcare</option>
+                                <option value="aetna">Aetna</option>
+                                <option value="cigna">Cigna</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Service Facility *</label>
+                            <select id="facility">
+                                <option value="">Select...</option>
+                                <option value="memorial-main">Memorial Hospital - Main Campus</option>
+                                <option value="outpatient-center">Outpatient Imaging Center</option>
+                                <option value="cardiac-specialty">Cardiac Specialty Center</option>
+                                <option value="memorial-north">North Clinic</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>CPT Code *</label>
+                            <select id="cptCode">
+                                <option value="">Select...</option>
+                                <option value="72148">72148 — MRI Lumbar Spine</option>
+                                <option value="99213">99213 — Office Visit</option>
+                                <option value="93458">93458 — Left Heart Catheterization</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Member ID</label>
+                            <input type="text" id="memberId" placeholder="ABC123456789">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clinical Notes -->
+                <div class="glass-card">
+                    <div class="section-label">Clinical Documentation</div>
+                    <div class="form-group">
+                        <label>Clinical Notes *</label>
+                        <textarea id="clinicalNotes" placeholder="CHIEF COMPLAINT:
+
+HISTORY OF PRESENT ILLNESS:
+
+PHYSICAL EXAMINATION:
+
+ASSESSMENT:
+
+PLAN:"></textarea>
+                    </div>
+                </div>
+
+                <button class="analyze-btn" onclick="runAnalysis()">
+                    🔍 Run AuthGuard Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════ AUTHGUARD PAGE ════════════════ -->
+    <div id="page-authguard" class="page">
+        <div class="ag-bg">
+            <div style="max-width:1100px; margin:0 auto;">
+                <h1 class="page-title">AuthGuard Analysis</h1>
+                <p class="page-sub">Prior authorization prediction, risk scoring & appeal generation</p>
+                <div id="ag-content">
+                    <div class="status-msg">
+                        <div style="font-size:3rem; margin-bottom:1rem;">🛡️</div>
+                        <div style="font-size:1.1rem; font-weight:600; color:rgba(255,255,255,0.7);">
+                            No analysis yet. Fill in patient details on the EHR tab and click "Run AuthGuard Analysis".
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ── PATIENT SCENARIOS ──────────────────────────────────────────
+    const scenarios = {
+        s1: {
+            firstName:"Sarah", lastName:"Johnson", insurance:"bcbs",
+            facility:"memorial-main", cptCode:"72148", memberId:"BCBS987654321",
+            clinicalNotes:`CHIEF COMPLAINT: Lower back pain radiating to left leg
+
+HISTORY OF PRESENT ILLNESS:
+Patient is a 41-year-old female presenting with chronic lower back pain radiating down the left leg for the past 8 weeks. Pain is 7/10 intensity, worse with prolonged sitting and bending forward. Patient reports numbness and tingling in the left L5 dermatome.
+
+CONSERVATIVE TREATMENT HISTORY:
+- Physical therapy: Completed 12 sessions over 6 weeks (March 1 - April 15, 2026) with minimal improvement
+- Medications: Ibuprofen 800mg TID for 6 weeks — inadequate pain relief
+- Activity modification attempted without significant benefit
+
+PHYSICAL EXAMINATION:
+- Positive straight leg raise test on left at 45 degrees
+- Decreased sensation in left L5 dermatome
+- Tenderness to palpation over L4-L5 region
+- Limited lumbar flexion
+
+ASSESSMENT:
+1. Chronic lumbar radiculopathy, left L5 distribution
+2. Likely L4-L5 disc herniation with nerve root compression
+3. Failed conservative management
+
+PLAN:
+Order MRI lumbar spine (CPT 72148) to evaluate for disc herniation.`
+        },
+        s2: {
+            firstName:"Michael", lastName:"Rodriguez", insurance:"bcbs",
+            facility:"memorial-main", cptCode:"72148", memberId:"BCBS456123",
+            clinicalNotes:`CHIEF COMPLAINT: Lower back pain
+
+HISTORY OF PRESENT ILLNESS:
+6 weeks of lower back pain, sometimes radiating to leg. Pain is moderate, around 5/10.
+
+CONSERVATIVE TREATMENT:
+- Physical therapy: 4 sessions completed
+- Taking ibuprofen as needed
+
+PHYSICAL EXAMINATION:
+- Tenderness over L4-L5
+- ROM slightly limited
+- Straight leg raise test equivocal
+
+ASSESSMENT:
+Lower back pain, likely musculoskeletal
+
+PLAN:
+MRI lumbar spine to evaluate further`
+        },
+        s3: {
+            firstName:"Robert", lastName:"Davis", insurance:"bcbs",
+            facility:"outpatient-center", cptCode:"72148", memberId:"BCBS789123",
+            clinicalNotes:`CHIEF COMPLAINT: Back pain
+
+HISTORY:
+Patient has back pain for 2-3 weeks.
+
+EXAMINATION:
+Back is tender when pressing on it.
+
+PLAN:
+Get MRI of lower back.`
+        },
+        s4: {
+            firstName:"James", lastName:"Anderson", insurance:"uhc",
+            facility:"cardiac-specialty", cptCode:"93458", memberId:"UHC445566",
+            clinicalNotes:`CHIEF COMPLAINT: Acute chest pain
+
+HISTORY OF PRESENT ILLNESS:
+62-year-old male with acute onset crushing substernal chest pain for 2 hours. Pain radiates to left arm, associated with diaphoresis and shortness of breath. Patient was admitted to hospital emergency department immediately.
+
+EMERGENCY EVALUATION:
+- EKG: ST-segment elevation 3mm in leads II, III, aVF (STEMI)
+- Troponin I: 6.8 ng/mL (significantly elevated)
+- Aspirin 325mg, clopidogrel 600mg loading dose administered
+
+CARDIOLOGY CONSULTATION:
+Emergent cardiology consultation obtained. Interventional cardiologist agrees with plan for immediate cardiac catheterization.
+
+ASSESSMENT:
+Acute ST-Elevation Myocardial Infarction (STEMI) - inferior wall. Patient is inpatient.
+
+PLAN:
+STAT left heart catheterization (CPT 93458) with likely PCI. Patient admitted to hospital CCU.`
+        },
+        s5: {
+            firstName:"Patricia", lastName:"Martinez", insurance:"uhc",
+            facility:"outpatient-center", cptCode:"93458", memberId:"UHC998877",
+            clinicalNotes:`CHIEF COMPLAINT: Occasional chest discomfort
+
+HISTORY:
+Patient reports occasional stable chest tightness over past few months with exertion, resolves with rest. No current symptoms. Elective evaluation.
+
+ASSESSMENT:
+Stable chronic coronary artery disease
+
+PLAN:
+Schedule elective left heart catheterization at outpatient center`
+        }
+    };
+
+    function loadScenario(id) {
+        const s = scenarios[id];
+        if (!s) return;
+        Object.keys(s).forEach(k => {
+            const el = document.getElementById(k);
+            if (el) el.value = s[k];
+        });
+    }
+
+    // ── PAYER RULES ──────────────────────────────────────────────
+    const payerRules = {
+        bcbs: {
+            "72148": {
+                requirements: [
+                    {rule:"Duration: 6+ weeks documented", keywords:["6 weeks","8 weeks","2 months","chronic"], weight:20},
+                    {rule:"Physical therapy: 6-8 sessions minimum", keywords:["physical therapy","pt","sessions","6 sessions","8 sessions","12 sessions"], weight:25},
+                    {rule:"NSAIDs trial: 4+ weeks", keywords:["ibuprofen","naproxen","nsaid","4 weeks","6 weeks"], weight:20},
+                    {rule:"Objective exam findings", keywords:["straight leg raise","slr","positive","tenderness","decreased sensation"], weight:20},
+                    {rule:"Failed conservative care documented", keywords:["failed","minimal relief","inadequate","not improved","persistent"], weight:15}
+                ]
+            },
+            "93458": {
+                requirements: [
+                    {rule:"Acute cardiac event", keywords:["acute","stemi","mi","unstable angina","acs"], weight:35},
+                    {rule:"Elevated troponin / positive stress test", keywords:["troponin","elevated","stress test","positive","ischemia"], weight:30},
+                    {rule:"Cardiology consultation", keywords:["cardiology","cardiologist","consultation"], weight:20},
+                    {rule:"Hospital / inpatient setting", keywords:["hospital","inpatient","admitted"], weight:15}
+                ]
+            },
+            "99213": {no_auth: true}
+        },
+        uhc: {
+            "72148": {
+                requirements: [
+                    {rule:"Duration: 6+ weeks", keywords:["6 weeks","8 weeks","chronic"], weight:20},
+                    {rule:"PT: 8+ sessions (UHC stricter)", keywords:["8 sessions","10 sessions","12 sessions"], weight:25},
+                    {rule:"NSAIDs: 6+ weeks trial", keywords:["ibuprofen","naproxen","6 weeks","8 weeks"], weight:20},
+                    {rule:"Objective neurological findings", keywords:["slr","positive","neurological","decreased sensation"], weight:20},
+                    {rule:"Failed conservative care", keywords:["failed","inadequate","not improved"], weight:15}
+                ]
+            },
+            "93458": {
+                facility_critical: true,
+                allowed_facilities: ["memorial-main","cardiac-specialty"],
+                denial_keywords: ["stable","chronic","elective","outpatient center"],
+                requirements: [
+                    {rule:"ACUTE indication (NOT elective)", keywords:["acute","stemi","myocardial infarction","emergency","unstable"], weight:35},
+                    {rule:"Elevated troponin documented", keywords:["troponin","elevated"], weight:30},
+                    {rule:"INPATIENT hospital setting", keywords:["admitted","inpatient","hospital","emergency department","ccu"], weight:20},
+                    {rule:"Cardiology consultation", keywords:["cardiology","cardiologist"], weight:15}
+                ]
+            },
+            "99213": {no_auth: true}
+        },
+        aetna: {
+            "72148": {
+                requirements: [
+                    {rule:"Duration: 6+ weeks", keywords:["6 weeks","8 weeks","chronic"], weight:20},
+                    {rule:"PT trial completed", keywords:["physical therapy","pt","sessions"], weight:25},
+                    {rule:"NSAIDs trial", keywords:["ibuprofen","naproxen","nsaid"], weight:20},
+                    {rule:"Objective exam findings", keywords:["slr","tenderness","neurological"], weight:20},
+                    {rule:"Conservative failure", keywords:["failed","inadequate"], weight:15}
+                ]
+            },
+            "93458": {
+                requirements: [
+                    {rule:"Acute cardiac event", keywords:["acute","stemi","mi","acs"], weight:35},
+                    {rule:"Positive cardiac testing", keywords:["troponin","elevated","stress test","ischemia"], weight:30},
+                    {rule:"Cardiology involved", keywords:["cardiology","cardiologist"], weight:20},
+                    {rule:"Hospital setting", keywords:["hospital","inpatient"], weight:15}
+                ]
+            },
+            "99213": {no_auth: true}
+        },
+        cigna: {
+            "72148": {
+                requirements: [
+                    {rule:"6+ weeks symptoms", keywords:["6 weeks","8 weeks","chronic"], weight:20},
+                    {rule:"PT completed", keywords:["physical therapy","pt"], weight:25},
+                    {rule:"NSAIDs trial", keywords:["ibuprofen","nsaid"], weight:20},
+                    {rule:"Clinical findings", keywords:["slr","positive","neurological"], weight:20},
+                    {rule:"Failed conservative", keywords:["failed","inadequate"], weight:15}
+                ]
+            },
+            "99213": {no_auth: true}
+        }
+    };
+
+    // ── NAVIGATION ──────────────────────────────────────────────
+    function switchPage(page, btn) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('page-' + page).classList.add('active');
+        if (btn) btn.classList.add('active');
+    }
+
+    // ── RUN ANALYSIS ─────────────────────────────────────────────
+    function runAnalysis() {
+        const data = {
+            firstName: document.getElementById('firstName').value.trim(),
+            lastName: document.getElementById('lastName').value.trim(),
+            insurance: document.getElementById('insurance').value,
+            facility: document.getElementById('facility').value,
+            cptCode: document.getElementById('cptCode').value,
+            memberId: document.getElementById('memberId').value,
+            clinicalNotes: document.getElementById('clinicalNotes').value.trim()
+        };
+
+        if (!data.insurance || !data.facility || !data.cptCode || !data.clinicalNotes || !data.firstName) {
+            alert('⚠️  Please fill in: First Name, Insurance, Facility, CPT Code, and Clinical Notes.');
+            return;
+        }
+
+        // Switch to AuthGuard tab
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('page-authguard').classList.add('active');
+        document.querySelectorAll('.nav-tab')[1].classList.add('active');
+
+        // Show loading
+        document.getElementById('ag-content').innerHTML = `
+            <div class="loading-wrap">
+                <div class="spinner"></div>
+                <div style="font-size:1rem; color:rgba(255,255,255,0.6);">Analyzing clinical documentation...</div>
+            </div>`;
+
+        setTimeout(() => {
+            const result = analyze(data);
+            renderResults(result, data);
+        }, 2000);
+    }
+
+    // ── CORE ANALYSIS ─────────────────────────────────────────────
+    function analyze(data) {
+        const notes = data.clinicalNotes.toLowerCase();
+        const rule = payerRules[data.insurance]?.[data.cptCode];
+
+        if (!rule) return {error: `No rules found for ${data.insurance.toUpperCase()} + CPT ${data.cptCode}`};
+        if (rule.no_auth) return {probability:100, confidence:"HIGH", message:"No Authorization Required", noAuth:true, action:"submit"};
+
+        // Facility warning for UHC 93458
+        let facilityWarning = null;
+        if (data.insurance === "uhc" && data.cptCode === "93458" && rule.facility_critical) {
+            if (!rule.allowed_facilities.includes(data.facility)) {
+                facilityWarning = "CRITICAL: UnitedHealthcare WILL DENY this claim. Cardiac catheterization must be performed at an inpatient hospital, not an outpatient center.";
+            }
+            if (rule.denial_keywords.some(k => notes.includes(k))) {
+                facilityWarning = (facilityWarning || "") + " Additionally, documentation indicates a stable/elective case — UHC requires ACUTE indication for authorization.";
+            }
+        }
+
+        // Score requirements
+        let totalScore = 0, maxScore = 0;
+        const met = [], missing = [];
+        rule.requirements.forEach(req => {
+            maxScore += req.weight;
+            const found = req.keywords.some(kw => notes.includes(kw.toLowerCase()));
+            if (found) { totalScore += req.weight; met.push(req); }
+            else missing.push(req);
+        });
+
+        let probability = Math.round((totalScore / maxScore) * 100);
+        if (facilityWarning && facilityWarning.includes("WILL DENY")) probability = Math.min(probability, 5);
+
+        // Confidence
+        const confidence = calcConfidence(notes);
+
+        // What If steps
+        const whatIfSteps = [];
+        let runP = probability;
+        missing.forEach(req => {
+            const gain = Math.round((req.weight / maxScore) * 100);
+            const after = Math.min(runP + gain, 99);
+            whatIfSteps.push({rule: req.rule, gain, before: runP, after});
+            runP = after;
+        });
+
+        // Action decision
+        let action, message, recommendation;
+        if (facilityWarning && probability < 20) {
+            action = "reject"; message = "Authorization Will Be Denied";
+            recommendation = facilityWarning;
+        } else if (probability >= 80 && confidence === "HIGH") {
+            action = "submit"; message = "Ready for Submission";
+            recommendation = "Documentation meets all requirements. Proceed with authorization request.";
+        } else if (probability >= 80) {
+            action = "review"; message = "Review Before Submitting";
+            recommendation = confidence === "MODERATE"
+                ? "Probability is high but documentation clarity needs review before submission."
+                : "AI Confidence is LOW — notes may be unclear. Human review required before submitting.";
+        } else if (probability >= 50) {
+            action = "review"; message = "Add Documentation First";
+            recommendation = "Missing key requirements. Use the What If Simulator below to see exactly what to add.";
+        } else {
+            action = "reject"; message = "High Denial Risk — Do Not Submit";
+            recommendation = "Significant documentation gaps. Return to EHR, add missing items, then re-analyze.";
+        }
+
+        return {probability, confidence, message, recommendation, met, missing, action, facilityWarning, whatIfSteps, maxPossible: runP};
+    }
+
+    function calcConfidence(notes) {
+        const high = ["detailed","comprehensive","documented","thorough"];
+        const low = ["unclear","approximately","around","maybe","unsure"];
+        const bad = ["but then","contradicts","however later"];
+        let score = 0;
+        high.forEach(w => { if (notes.includes(w)) score += 2; });
+        low.forEach(w => { if (notes.includes(w)) score -= 2; });
+        bad.forEach(w => { if (notes.includes(w)) score -= 3; });
+        if (/\d{1,2}\/\d{1,2}\/\d{4}|march|april|january|february/.test(notes)) score += 2;
+        if (/\d+ (sessions|weeks|months|days)/.test(notes)) score += 2;
+        if (notes.length < 100) score -= 3;
+        if (notes.length > 500) score += 1;
+        const base = notes.length > 500 ? 60 : notes.length > 200 ? 40 : 20;
+        const final = base + (score * 5);
+        if (final >= 80) return "HIGH";
+        if (final >= 50) return "MODERATE";
+        return "LOW";
+    }
+
+    // ── RENDER RESULTS ───────────────────────────────────────────
+    function renderResults(result, data) {
+        if (result.error) {
+            document.getElementById('ag-content').innerHTML = `
+                <div class="status-msg" style="color:#fca5a5;">${result.error}</div>`;
+            return;
+        }
+
+        const probColor = result.probability >= 80 ? '#10b981' : result.probability >= 50 ? '#f59e0b' : '#ef4444';
+        const confColor = result.confidence === 'HIGH' ? '#10b981' : result.confidence === 'MODERATE' ? '#f59e0b' : '#ef4444';
+
+        // Requirements
+        let reqHTML = '';
+        if (result.met && result.met.length) {
+            reqHTML += '<h3 style="color:#6ee7b7; margin-bottom:0.75rem;">✅ Requirements Met</h3>';
+            result.met.forEach(r => {
+                reqHTML += `<div class="req-item"><span>✅</span><span>${r.rule}</span></div>`;
+            });
+        }
+        if (result.missing && result.missing.length) {
+            reqHTML += `<h3 style="color:#fca5a5; margin-top:1.25rem; margin-bottom:0.75rem;">❌ Missing Requirements</h3>`;
+            result.missing.forEach(r => {
+                reqHTML += `<div class="req-item"><span>❌</span><span>${r.rule}</span></div>`;
+            });
+        }
+
+        // What If Simulator
+        let whatIfHTML = '';
+        if (result.whatIfSteps && result.whatIfSteps.length && result.probability < 99) {
+            const steps = result.whatIfSteps.map((s, i) => `
+                <div class="whatif-step">
+                    <span style="font-size:1.3rem;">💡</span>
+                    <div class="whatif-text">
+                        <strong>Step ${i+1}: Add "${s.rule}"</strong>
+                        Probability: ${s.before}% → ${s.after}%
+                    </div>
+                    <span class="gain-badge">+${s.gain}%</span>
+                </div>`).join('');
+
+            whatIfHTML = `
+                <div class="whatif-card">
+                    <h3>🔮 What If Simulator</h3>
+                    <div class="whatif-subtitle">Here's exactly what to add to improve your approval probability:</div>
+                    ${steps}
+                    <div class="whatif-final">
+                        <span>If all items added:</span>
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            <span class="prob-pill prob-before">${result.probability}%</span>
+                            <span style="color:rgba(255,255,255,0.5); font-size:1.2rem;">→</span>
+                            <span class="prob-pill prob-after">${result.maxPossible}% ✅</span>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        // Action button + Appeal Generator
+        let actionHTML = '';
+        if (result.action === 'submit') {
+            actionHTML = `<button class="action-btn btn-submit" onclick="doSubmit('${data.insurance}')">✅ Submit Authorization Request</button>`;
+        } else if (result.action === 'review') {
+            actionHTML = `<button class="action-btn btn-review" onclick="doReview()">📋 Flag for Manual Review</button>`;
+        } else {
+            actionHTML = `
+                <button class="action-btn btn-reject" onclick="doReject()">🚫 Blocked — Return to EHR & Add Documentation</button>
+                <div class="appeal-card">
+                    <h3>📄 One-Click Appeal Generator</h3>
+                    <p>If this claim was already submitted and denied, generate a formal appeal letter instantly.</p>
+                    <button class="appeal-btn" onclick="generateAppeal('${data.insurance}', '${data.cptCode}')">
+                        ⚡ Generate Appeal Letter Now
+                    </button>
+                    <div class="appeal-letter" id="appealLetterBox"></div>
+                    <div id="copyWrap" style="display:none;">
+                        <button class="copy-btn" onclick="copyAppeal()">📋 Copy to Clipboard</button>
+                    </div>
+                </div>`;
+        }
+
+        document.getElementById('ag-content').innerHTML = `
+            ${result.facilityWarning ? `
+                <div class="payer-alert">
+                    <h3>🚨 PAYER ALERT — ${data.insurance.toUpperCase()}</h3>
+                    <p style="line-height:1.7;">${result.facilityWarning}</p>
+                </div>` : ''}
+
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:1.25rem; margin-bottom:1.5rem; color:rgba(255,255,255,0.7); font-size:0.9rem;">
+                Patient: <strong style="color:white;">${data.firstName} ${data.lastName}</strong> &nbsp;|&nbsp;
+                Payer: <strong style="color:white;">${data.insurance.toUpperCase()}</strong> &nbsp;|&nbsp;
+                CPT: <strong style="color:white;">${data.cptCode}</strong>
+            </div>
+
+            <div class="metrics-row">
+                <div class="metric-box">
+                    <div class="metric-value" style="color:${probColor};">${result.probability}%</div>
+                    <div class="metric-label">Approval Probability</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value" style="color:${confColor}; font-size:2.5rem;">${result.confidence}</div>
+                    <div class="metric-label">AI Confidence</div>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-bottom:2rem; color:white;">
+                <h2 style="font-size:1.75rem; margin-bottom:0.5rem;">${result.message}</h2>
+                <p style="font-size:1rem; color:rgba(255,255,255,0.7); max-width:650px; margin:0 auto;">${result.recommendation}</p>
+            </div>
+
+            ${reqHTML ? `<div class="req-section">${reqHTML}</div>` : ''}
+            ${whatIfHTML}
+            ${actionHTML}`;
+    }
+
+    // ── ACTION HANDLERS ──────────────────────────────────────────
+    function doSubmit(payer) {
+        if (confirm(`Submit authorization request to ${payer.toUpperCase()} payer portal?`)) {
+            alert(`✅ Authorization Submitted!\n\nReference: PA-${Date.now()}\nExpected Response: 3-5 business days\nStatus: Pending Payer Review`);
+        }
+    }
+
+    function doReview() {
+        alert('📋 Case flagged for manual review.\n\nA notification has been sent to the billing team. An authorization specialist will review within 24 hours.');
+    }
+
+    function doReject() {
+        // Switch back to EHR tab
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('page-ehr').classList.add('active');
+        document.querySelectorAll('.nav-tab')[0].classList.add('active');
+        alert('🚫 Submission blocked.\n\nYou have been returned to the EHR. Please add the missing documentation listed in the analysis, then run AuthGuard again.');
+    }
+
+    function generateAppeal(payer, cpt) {
+        const box = document.getElementById('appealLetterBox');
+        const wrap = document.getElementById('copyWrap');
+        const today = new Date().toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
+        const fn = document.getElementById('firstName').value;
+        const ln = document.getElementById('lastName').value;
+        const notes = document.getElementById('clinicalNotes').value;
+        const facility = document.getElementById('facility').value;
+
+        const cptNames = {'72148':'MRI Lumbar Spine Without Contrast', '93458':'Left Heart Catheterization', '99213':'Office Visit'};
+        const denials = {'uhc':'Medical Necessity Not Established', 'bcbs':'Insufficient Conservative Treatment Documentation', 'aetna':'Clinical Criteria Not Met', 'cigna':'Step Therapy Requirements Not Satisfied'};
+
+        box.textContent = `${today}
+
+Appeals Department
+${payer.toUpperCase()} Insurance Company
+
+RE: FORMAL APPEAL — Prior Authorization Denial
+Patient: ${fn} ${ln}
+Procedure: CPT ${cpt} — ${cptNames[cpt] || 'Requested Procedure'}
+Denial Reason: ${denials[payer] || 'Medical Necessity Not Established'}
+
+To Whom It May Concern,
+
+We are writing to formally appeal the denial of prior authorization for the above-referenced patient and procedure. We respectfully disagree with the determination and submit the following clinical justification.
+
+CLINICAL SUMMARY:
+${notes.substring(0, 500)}...
+
+BASIS FOR APPEAL:
+
+1. MEDICAL NECESSITY: The requested procedure is medically necessary based on the patient's documented condition, symptom severity, and failure of conservative treatment.
+
+2. CLINICAL GUIDELINES: This request is consistent with evidence-based guidelines and nationally recognized standards of care for the documented diagnosis.
+
+3. CONSERVATIVE TREATMENT FAILURE: The patient has undergone appropriate conservative treatment without adequate improvement, making this the next appropriate step in care.
+
+4. PATIENT SAFETY: Further delay poses ongoing risk to the patient's health and may result in disease progression and increased costs.
+
+REQUESTED ACTION:
+We respectfully request an immediate review and ask that authorization be granted for CPT ${cpt}. We are available for peer-to-peer review if required.
+
+Sincerely,
+
+Attending Physician / Authorization Department
+Facility: ${facility || 'Memorial Hospital'}
+NPI: 1234567890
+
+ATTACHMENTS: Complete clinical notes, diagnostic results, treatment history records`;
+
+        box.classList.add('show');
+        wrap.style.display = 'block';
+    }
+
+    function copyAppeal() {
+        const text = document.getElementById('appealLetterBox').textContent;
+        navigator.clipboard.writeText(text)
+            .then(() => alert('✅ Appeal letter copied to clipboard!'))
+            .catch(() => alert('Please manually select and copy the text.'));
+    }
+    </script>
+</body>
+</html>

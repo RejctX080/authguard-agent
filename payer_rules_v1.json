@@ -1,0 +1,122 @@
+{
+  "payer_rules": {
+    "bcbs": {
+      "72148": {
+        "description": "MRI Lumbar Spine",
+        "auth_required": true,
+        "payer_notes": "BCBS requires detailed conservative treatment documentation",
+        "requirements": [
+          {"rule": "Duration: 6+ weeks", "keywords": ["6 weeks", "8 weeks", "2 months", "chronic"], "weight": 20},
+          {"rule": "PT: 6-8 sessions minimum", "keywords": ["physical therapy", "PT", "sessions", "6 sessions", "8 sessions", "12 sessions"], "weight": 25},
+          {"rule": "NSAIDs: 4+ weeks trial", "keywords": ["ibuprofen", "naproxen", "NSAID", "medication", "4 weeks", "6 weeks"], "weight": 20},
+          {"rule": "Objective exam findings", "keywords": ["straight leg raise", "SLR", "positive", "tenderness", "decreased sensation"], "weight": 20},
+          {"rule": "Failed conservative care", "keywords": ["failed", "minimal relief", "inadequate", "not improved", "persistent"], "weight": 15}
+        ]
+      },
+      "99213": {
+        "description": "Office Visit",
+        "auth_required": false,
+        "requirements": []
+      },
+      "93458": {
+        "description": "Left Heart Catheterization",
+        "auth_required": true,
+        "requirements": [
+          {"rule": "Acute cardiac syndrome", "keywords": ["acute", "STEMI", "MI", "unstable angina", "ACS"], "weight": 30},
+          {"rule": "Positive cardiac testing", "keywords": ["stress test", "troponin", "elevated", "ischemia"], "weight": 30},
+          {"rule": "Cardiology evaluation", "keywords": ["cardiology", "cardiologist", "consultation"], "weight": 20},
+          {"rule": "Appropriate setting", "keywords": ["hospital", "inpatient", "admitted"], "weight": 20}
+        ]
+      }
+    },
+    "uhc": {
+      "72148": {
+        "description": "MRI Lumbar Spine",
+        "auth_required": true,
+        "payer_notes": "UnitedHealthcare has strict step therapy requirements",
+        "requirements": [
+          {"rule": "Duration: 6+ weeks", "keywords": ["6 weeks", "8 weeks", "chronic"], "weight": 20},
+          {"rule": "PT: minimum 8 sessions", "keywords": ["physical therapy", "PT", "8 sessions", "10 sessions", "12 sessions"], "weight": 25},
+          {"rule": "NSAIDs: 6+ weeks trial", "keywords": ["ibuprofen", "naproxen", "NSAID", "6 weeks", "8 weeks"], "weight": 20},
+          {"rule": "Objective findings documented", "keywords": ["SLR", "positive", "neurological", "decreased sensation"], "weight": 20},
+          {"rule": "Conservative failure documented", "keywords": ["failed", "inadequate", "not improved"], "weight": 15}
+        ]
+      },
+      "93458": {
+        "description": "Left Heart Catheterization",
+        "auth_required": true,
+        "payer_notes": "⚠️ UHC CRITICAL: INPATIENT HOSPITAL ONLY - Will deny outpatient facility",
+        "facility_restrictions": {
+          "allowed": ["memorial-main", "cardiac-specialty"],
+          "denied": ["outpatient-center", "memorial-north"],
+          "denial_message": "UnitedHealthcare WILL DENY: Cardiac catheterization must be performed at inpatient hospital facility, not outpatient centers"
+        },
+        "requirements": [
+          {"rule": "ACUTE indication (NOT elective)", "keywords": ["acute", "STEMI", "myocardial infarction", "emergency", "unstable"], "weight": 35},
+          {"rule": "Elevated troponin or positive stress", "keywords": ["troponin", "elevated", "stress test", "positive", "ischemia"], "weight": 30},
+          {"rule": "INPATIENT hospital setting", "keywords": ["admitted", "inpatient", "hospital", "emergency department", "ICU"], "weight": 20},
+          {"rule": "Cardiology consultation", "keywords": ["cardiology", "cardiologist"], "weight": 15}
+        ],
+        "high_risk_scenarios": [
+          {
+            "condition": "outpatient_facility",
+            "denial_probability": 95,
+            "reason": "UHC requires inpatient hospital for cardiac cath - WILL DENY outpatient"
+          },
+          {
+            "condition": "stable_cad",
+            "keywords": ["stable", "chronic", "elective"],
+            "denial_probability": 85,
+            "reason": "UHC requires acute indication - stable CAD should have stress test first"
+          }
+        ]
+      },
+      "99213": {
+        "description": "Office Visit",
+        "auth_required": false,
+        "requirements": []
+      }
+    },
+    "aetna": {
+      "72148": {
+        "description": "MRI Lumbar Spine",
+        "auth_required": true,
+        "requirements": [
+          {"rule": "Duration: 6+ weeks", "keywords": ["6 weeks", "8 weeks", "chronic"], "weight": 20},
+          {"rule": "PT trial completed", "keywords": ["physical therapy", "PT", "sessions"], "weight": 25},
+          {"rule": "Medication trial", "keywords": ["ibuprofen", "naproxen", "NSAID"], "weight": 20},
+          {"rule": "Exam findings", "keywords": ["SLR", "tenderness", "neurological"], "weight": 20},
+          {"rule": "Conservative failure", "keywords": ["failed", "inadequate"], "weight": 15}
+        ]
+      },
+      "93458": {
+        "description": "Left Heart Catheterization",
+        "auth_required": true,
+        "requirements": [
+          {"rule": "Acute cardiac event", "keywords": ["acute", "STEMI", "MI", "ACS"], "weight": 30},
+          {"rule": "Cardiac testing positive", "keywords": ["troponin", "stress test", "ischemia"], "weight": 30},
+          {"rule": "Cardiology involved", "keywords": ["cardiology", "cardiologist"], "weight": 20},
+          {"rule": "Hospital setting", "keywords": ["hospital", "inpatient"], "weight": 20}
+        ]
+      }
+    },
+    "cigna": {
+      "72148": {
+        "description": "MRI Lumbar Spine",
+        "auth_required": true,
+        "requirements": [
+          {"rule": "6+ weeks symptoms", "keywords": ["6 weeks", "8 weeks", "chronic"], "weight": 20},
+          {"rule": "PT completed", "keywords": ["physical therapy", "PT"], "weight": 25},
+          {"rule": "NSAIDs trial", "keywords": ["ibuprofen", "NSAID"], "weight": 20},
+          {"rule": "Clinical findings", "keywords": ["SLR", "positive", "neurological"], "weight": 20},
+          {"rule": "Failed conservative", "keywords": ["failed", "inadequate"], "weight": 15}
+        ]
+      }
+    }
+  },
+  "confidence_keywords": {
+    "high_quality": ["detailed", "comprehensive", "thorough", "documented", "records", "specific dates"],
+    "low_quality": ["unclear", "patient states", "approximately", "around", "maybe", "unsure"],
+    "contradictory": ["but then", "however later", "changed", "contradicts"]
+  }
+}
