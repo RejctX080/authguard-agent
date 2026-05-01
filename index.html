@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthGuard Agent v1.0 — AI-Powered Prior Authorization</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --purple: #667eea;
+            --violet: #764ba2;
+            --teal: #14B8A6;
+            --dark: #0a0a0f;
+        }
+
+        body {
+            background: var(--dark);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ════════════════════════════════
+           VIDEO SCREEN
+        ════════════════════════════════ */
+        #video-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.2s ease;
+        }
+
+        #video-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #intro-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* No video fallback */
+        .no-video-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1040 50%, #0a0a0f 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .no-video-logo {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .no-video-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .no-video-sub {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.6);
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        /* Skip button */
+        .skip-btn {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .skip-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Progress bar */
+        .video-progress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--purple), var(--teal));
+            width: 0%;
+            z-index: 100;
+            transition: width 0.3s linear;
+            box-shadow: 0 0 10px rgba(102,126,234,0.8);
+        }
+
+        /* ════════════════════════════════
+           LANDING SCREEN
+        ════════════════════════════════ */
+        #landing-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+        }
+
+        #landing-screen.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Animated background */
+        .landing-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 50%, rgba(102,126,234,0.25) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 20%, rgba(118,75,162,0.25) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 90%, rgba(20,184,166,0.15) 0%, transparent 55%),
+                #0a0a0f;
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: rgba(102,126,234,0.15);
+            top: -100px; left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px; height: 300px;
+            background: rgba(118,75,162,0.15);
+            bottom: -50px; right: -50px;
+            animation-delay: -3s;
+        }
+
+        .orb-3 {
+            width: 200px; height: 200px;
+            background: rgba(20,184,166,0.1);
+            top: 50%; left: 50%;
+            animation-delay: -6s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* Grid overlay */
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(102,126,234,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(102,126,234,0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        /* Content */
+        .landing-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(102,126,234,0.15);
+            border: 1px solid rgba(102,126,234,0.3);
+            color: rgba(255,255,255,0.8);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s ease 0.3s both;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--teal);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Shield icon */
+        .shield-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            animation: slideDown 0.6s ease 0.5s both, glow 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(102,126,234,0.5));
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(102,126,234,0.4)); }
+            50% { filter: drop-shadow(0 0 40px rgba(102,126,234,0.8)); }
+        }
+
+        /* Title */
+        .landing-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideDown 0.6s ease 0.7s both;
+        }
+
+        .title-gradient {
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .version-tag {
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s ease 0.9s both;
+        }
+
+        /* Quote */
+        .quote-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 3px solid var(--purple);
+            border-radius: 12px;
+            padding: 1.25rem 1.75rem;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.6s ease 1.1s both;
+        }
+
+        .quote-text {
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .quote-author {
+            font-size: 0.85rem;
+            color: var(--teal);
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        /* Stats row */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            animation: slideDown 0.6s ease 1.3s both;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.45);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* CTA Button */
+        .cta-wrap {
+            animation: slideDown 0.6s ease 1.5s both;
+        }
+
+        .cta-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1.25rem 3rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, var(--purple), var(--violet));
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            box-shadow:
+                0 10px 40px rgba(102,126,234,0.4),
+                0 0 0 0 rgba(102,126,234,0.4);
+            animation: ctaPulse 2.5s ease-in-out infinite 2s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow:
+                0 20px 60px rgba(102,126,234,0.6),
+                0 0 0 8px rgba(102,126,234,0.1);
+        }
+
+        .cta-btn:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+
+        @keyframes ctaPulse {
+            0%, 100% { box-shadow: 0 10px 40px rgba(102,126,234,0.4), 0 0 0 0 rgba(102,126,234,0.3); }
+            50% { box-shadow: 0 10px 40px rgba(102,126,234,0.4), 0 0 0 12px rgba(102,126,234,0); }
+        }
+
+        .cta-arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.3rem;
+        }
+
+        .cta-btn:hover .cta-arrow {
+            transform: translateX(5px);
+        }
+
+        .cta-sub {
+            margin-top: 1rem;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.5px;
+        }
+
+        /* Powered by */
+        .powered-by {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.2);
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            z-index: 30;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .landing-title { font-size: 2rem; }
+            .stats-row { gap: 1.5rem; }
+            .cta-btn { padding: 1rem 2rem; font-size: 1rem; }
+            .shield-icon { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ════════════ VIDEO SCREEN ════════════ -->
+    <div id="video-screen">
+        <!-- Replace 'assets/video.mp4' with your actual video file name -->
+        <video
+            id="intro-video"
+            playsinline
+            autoplay
+            muted
+            onended="showLanding()"
+            ontimeupdate="updateProgress()"
+            onerror="showNoVideo()">
+            <source src="assets/video.mp4" type="video/mp4">
+        </video>
+
+        <!-- Fallback if no video found -->
+        <div class="no-video-bg" id="no-video-fallback" style="display:none;">
+            <div class="no-video-logo">🛡️</div>
+            <div class="no-video-title">AuthGuard Agent v1.0</div>
+            <div class="no-video-sub">
+                AI-Powered Prior Authorization Guardrail<br>
+                for Healthcare Revenue Cycle Management
+            </div>
+        </div>
+    </div>
+
+    <!-- Skip button -->
+    <button class="skip-btn" onclick="showLanding()">
+        Skip Intro ›
+    </button>
+
+    <!-- Video progress bar -->
+    <div class="video-progress" id="progress-bar"></div>
+
+    <!-- ════════════ LANDING SCREEN ════════════ -->
+    <div id="landing-screen">
+        <!-- Background layers -->
+        <div class="landing-bg"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="grid-overlay"></div>
+
+        <!-- Main content -->
+        <div class="landing-content">
+
+            <!-- Badge -->
+            <div class="badge">
+                <span class="badge-dot"></span>
+                Now Live — Prototype
+            </div>
+
+            <!-- Shield -->
+            <span class="shield-icon">🛡️</span>
+
+            <!-- Title -->
+            <h1 class="landing-title">
+                <span class="title-gradient">AuthGuard</span> Agent
+            </h1>
+            <span class="version-tag">v1.0 (Prototype)</span>
+
+            <!-- Quote -->
+            <div class="quote-box">
+                <div class="quote-text">
+                    "The best time to prevent a denial is
+                    <strong style="color:white;">before</strong> you submit the claim."
+                </div>
+                <div class="quote-author">— AuthGuard Agent v1.0</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <span class="stat-num">94.2%</span>
+                    <span class="stat-label">First-Pass Rate</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">↓3.8%</span>
+                    <span class="stat-label">Denial Rate</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">$127K</span>
+                    <span class="stat-label">Annual Savings</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">342hrs</span>
+                    <span class="stat-label">Saved / Month</span>
+                </div>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="cta-wrap">
+                <a class="cta-btn" href="authguard-complete.html">
+                    ⚡ Experience in Reality
+                    <span class="cta-arrow">→</span>
+                </a>
+                <div class="cta-sub">
+                    No login required · Works instantly · No API key needed
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Powered by -->
+    <div class="powered-by" id="powered-tag" style="display:none;">
+        AI-Powered Prior Authorization Intelligence
+    </div>
+
+    <script>
+        let landed = false;
+
+        // Auto-show landing if video fails to load
+        function showNoVideo() {
+            document.getElementById('no-video-fallback').style.display = 'flex';
+            setTimeout(showLanding, 4000);
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const video = document.getElementById('intro-video');
+            if (video.duration) {
+                const pct = (video.currentTime / video.duration) * 100;
+                document.getElementById('progress-bar').style.width = pct + '%';
+            }
+        }
+
+        // Show landing screen
+        function showLanding() {
+            if (landed) return;
+            landed = true;
+
+            const videoScreen = document.getElementById('video-screen');
+            const landingScreen = document.getElementById('landing-screen');
+            const skipBtn = document.querySelector('.skip-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const poweredTag = document.getElementById('powered-tag');
+
+            // Pause video
+            const video = document.getElementById('intro-video');
+            if (video) video.pause();
+
+            // Fade out video
+            videoScreen.classList.add('fade-out');
+            skipBtn.style.display = 'none';
+            progressBar.style.width = '100%';
+
+            // Show landing
+            setTimeout(() => {
+                videoScreen.style.display = 'none';
+                landingScreen.classList.add('show');
+                poweredTag.style.display = 'block';
+            }, 1200);
+        }
+
+        // Keyboard shortcut: Space or Enter to skip
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === 'Space' || e.code === 'Enter') && !landed) {
+                showLanding();
+            }
+        });
+
+        // If video doesn't start in 3s (no file), show fallback
+        setTimeout(() => {
+            const video = document.getElementById('intro-video');
+            if (video && video.readyState === 0 && !landed) {
+                showNoVideo();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
