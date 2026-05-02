@@ -2,7 +2,7 @@
 ### AI-Powered Prior Authorization Guardrail for Healthcare RCM
 
 <p align="center">
-  <img src="assets/pandamascot.png" alt="AuthGuard Agent" width="180"/>
+  <img src="assets/logo.png" alt="AuthGuard Agent" width="180"/>
 </p>
 
 <p align="center">
