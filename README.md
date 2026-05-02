@@ -14,4 +14,4 @@ Guardrail for Healthcare RCM
 HTML | CSS | JavaScript | Claude AI API
 
 ## Live Demo
-[Experience AuthGuard →](your-link-here)
+[Experience AuthGuard →](https://rejctx080.github.io/authguard-agent/)
