@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Live Demo-Experience Now-667eea?style=for-the-badge&logo=github" alt="Live Demo"/>
   </a>
   &nbsp;
-  <img src="https://img.shields.io/badge/Version-1.0 Prototype-764ba2?style=for-the-badge" alt="Version"/>
+  <img src="https://img.shields.io/badge/Version-1.0-764ba2?style=for-the-badge" alt="Version"/>
   &nbsp;
   <img src="https://img.shields.io/badge/Status-Active-10B981?style=for-the-badge" alt="Status"/>
 </p>
@@ -126,7 +126,7 @@ Load pre-built scenarios in the EHR tab to instantly test different outcomes:
 
 ## 🔭 Roadmap
 
-### Current (v1.0 Prototype)
+### Current (v1.0)
 - [x] Payer-specific rule engine
 - [x] Dual scoring (probability + AI confidence)
 - [x] Approval path optimizer
@@ -201,12 +201,12 @@ $127K   Annual Savings Per Provider
 
 ## ⚠️ Disclaimer
 
-AuthGuard Agent v1.0 is a **prototype** built for demonstration purposes. It does not constitute medical, legal, or financial advice. All patient data in the demo is fictional. Not HIPAA-compliant in current form. For production healthcare use, a compliant infrastructure is required.
+AuthGuard Agent v1.0 is a built for **demonstration purposes**. It does not constitute medical, legal, or financial advice. All patient data in the demo is fictional. Not HIPAA-compliant in current form. For production healthcare use, a compliant infrastructure is required.
 
 ---
 
 <p align="center">
-  <strong>AuthGuard Agent v1.0 (Prototype)</strong><br/>
+  <strong>AuthGuard Agent v1.0</strong><br/>
   AI-Powered Prior Authorization Intelligence<br/><br/>
   <em>Don't chase denials. Prevent them.</em>
 </p>
