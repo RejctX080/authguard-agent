@@ -2,11 +2,11 @@
 ### AI-Powered Prior Authorization Guardrail for Healthcare RCM
 
 <p align="center">
-  <img src="assets/panda.png" alt="AuthGuard Agent" width="180"/>
+  <img src="assets/pandamascot.png" alt="AuthGuard Agent" width="180"/>
 </p>
 
 <p align="center">
-  <a href="https://your-github-username.github.io/authguard-agent">
+  <a href="https://rejctx080.github.io/authguard-agent">
     <img src="https://img.shields.io/badge/Live Demo-Experience Now-667eea?style=for-the-badge&logo=github" alt="Live Demo"/>
   </a>
   &nbsp;
@@ -18,7 +18,6 @@
 ---
 
 > **"The best time to prevent a denial is before you submit the claim."**
-> — AuthGuard Agent v1.0
 
 ---
 
@@ -27,19 +26,19 @@
 Every year, the U.S. healthcare system loses **$440 billion** to administrative waste.
 
 - **15–20%** of all prior authorization requests are **denied**
-- Most denials happen because of **missing documentation** — not bad clinical decisions
+- Most denials happen because of **missing documentation** not bad clinical decisions
 - Billing staff spend **60–70%** of their time on repetitive, manual tasks
-- The average denied claim costs **$118** to rework — and many are never recovered
+- The average denied claim costs **$118** to rework and many are never recovered
 
 **The system is broken. Paperwork is costing patients their care.**
 
 ---
 
-## 💡 The Solution — AuthGuard Agent
+## 💡 The Solution "AuthGuard Agent"
 
-AuthGuard Agent is an **AI-powered prior authorization guardrail** that predicts whether a claim will be approved or denied — **before you ever submit it.**
+AuthGuard Agent is an **AI-powered prior authorization guardrail** that predicts whether a claim will be approved or denied **before you ever submit it.**
 
-Instead of reacting to denials after the fact, AuthGuard puts an intelligent layer **between your clinical documentation and the payer** — catching problems in real time.
+Instead of reacting to denials after the fact, AuthGuard puts an intelligent layer **between your clinical documentation and the payer** catching problems in real time.
 
 ---
 
@@ -47,10 +46,6 @@ Instead of reacting to denials after the fact, AuthGuard puts an intelligent lay
 
 ### 🔍 Payer-Specific Intelligence
 Not all payers play by the same rules. AuthGuard knows the difference:
-- **BCBS** → Requires 6-8 PT sessions minimum
-- **UnitedHealthcare** → Cardiac cath requires **inpatient hospital only** (will deny outpatient)
-- **Aetna** → Needs specialist referral for advanced imaging
-- **Cigna** → Strict step therapy requirements
 
 ### 📊 Dual Scoring System
 ```
@@ -61,8 +56,8 @@ AI Confidence Score   →  Is the documentation strong enough to survive scrutin
 95% Probability + HIGH Confidence = Safe to submit
 ```
 
-### 🔮 What If Simulator
-Doesn't just show what's missing — shows **exactly what to add and how much it helps:**
+### 🔮 Approval path optimizer
+Doesn't just show what's missing shows **exactly what to add and how much it helps:**
 ```
 ❌ Current:  45% approval probability
 
@@ -74,30 +69,14 @@ Doesn't just show what's missing — shows **exactly what to add and how much it
 ```
 
 ### ⚡ One-Click Appeal Generator
-When a claim is denied — generate a complete, formal, payer-specific appeal letter **instantly** from the clinical notes. Ready to send.
+When a claim is denied generate a complete, formal, payer-specific appeal letter **instantly** from the clinical notes. Ready to send.
 
 ### 🚨 Facility Risk Detection
 Catches facility-payer mismatches before submission:
-```
-⚠️ CRITICAL: UnitedHealthcare WILL DENY
-Cardiac catheterization at outpatient center.
-UHC requires inpatient hospital setting.
-```
-
-### 🎯 Smart Action Buttons
-```
-80%+ Probability + HIGH Confidence  →  ✅ Submit Authorization
-80%+ Probability + MODERATE/LOW     →  📋 Flag for Manual Review
-Below 50%                           →  🚫 Blocked + Appeal Generator
-```
-
----
 
 ## 🎬 Demo
 
-**Watch the intro video and experience the prototype:**
-
-👉 **[Experience AuthGuard in Reality →](https://your-github-username.github.io/authguard-agent)**
+👉 **[Experience AuthGuard →](https://rejctx080.github.io/authguard-agent)**
 
 ---
 
@@ -114,11 +93,11 @@ Below 50%                           →  🚫 Blocked + Appeal Generator
 │              ↓                                      │
 │   4. Shows approval probability + AI confidence     │
 │              ↓                                      │
-│   5. What If Simulator shows how to improve         │
+│   5. Approval path optimizer shows how to improve         │
 │              ↓                                      │
 │   6. Smart button: Submit / Review / Block          │
 │              ↓                                      │
-│   7. If blocked → One-click appeal letter           │
+│   7. If previous denials → One-click appeal letter  │
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
@@ -127,46 +106,7 @@ Below 50%                           →  🚫 Blocked + Appeal Generator
 
 ## 📋 Supported CPT Codes & Payers
 
-| CPT Code | Procedure | BCBS | UHC | Aetna | Cigna |
-|----------|-----------|------|-----|-------|-------|
-| 72148 | MRI Lumbar Spine | ✅ | ✅ | ✅ | ✅ |
-| 93458 | Left Heart Catheterization | ✅ | ✅ ⚠️ | ✅ | ✅ |
-| 99213 | Office Visit | ✅ No Auth | ✅ No Auth | ✅ No Auth | ✅ No Auth |
-
-> ⚠️ UHC has strict inpatient facility requirement for cardiac cath
-
----
-
-## 📁 Repository Structure
-
-```
-📁 authguard-agent/
-│
-├── 🌐 index.html                 ← Landing page (video + CTA)
-├── 🛡️ authguard-complete.html    ← Main prototype (EHR + AuthGuard)
-├── 📊 payer_rules.json           ← Payer-specific rule database
-├── 📖 README.md                  ← You are here
-│
-└── 📁 assets/
-    ├── 🎬 video.mp4              ← Intro video
-    └── 🐼 panda.png              ← Infinx mascot
-```
-
----
-
-## 🚀 Run Locally
-
-No installation required. No server needed. No API key needed.
-
-```bash
-# Clone the repository
-git clone https://github.com/your-username/authguard-agent.git
-
-# Open in browser
-open index.html
-```
-
-Or just visit the **[Live Demo](https://your-github-username.github.io/authguard-agent)** directly.
+It will have dropdown menu for CPT Code and Diagnosis code for future models.
 
 ---
 
@@ -189,7 +129,7 @@ Load pre-built scenarios in the EHR tab to instantly test different outcomes:
 ### Current (v1.0 Prototype)
 - [x] Payer-specific rule engine
 - [x] Dual scoring (probability + AI confidence)
-- [x] What If Simulator
+- [x] Approval path optimizer
 - [x] One-Click Appeal Generator
 - [x] Facility risk detection
 - [x] 5 realistic test scenarios
@@ -208,6 +148,7 @@ Load pre-built scenarios in the EHR tab to instantly test different outcomes:
 - [ ] Real-time EHR sync
 - [ ] ML model trained on denial patterns
 - [ ] HIPAA-compliant infrastructure
+- [ ] Microsoft Teams "As Bot"
 
 ---
 
@@ -223,17 +164,16 @@ Load pre-built scenarios in the EHR tab to instantly test different outcomes:
 
 ---
 
-## ⚡ Why AuthGuard Wins
+## ⚡ Why AuthGuard?
 
 | Feature | AuthGuard | Traditional RCM Tools |
 |---------|-----------|----------------------|
 | Pre-submission prediction | ✅ | ❌ |
 | Payer-specific rules | ✅ | Partial |
 | AI Confidence scoring | ✅ | ❌ |
-| What If Simulator | ✅ | ❌ |
+| Approval Path Optimizer | ✅ | ❌ |
 | One-click appeal letters | ✅ | ❌ |
 | Facility risk detection | ✅ | ❌ |
-| Setup required | None | Weeks |
 
 ---
 
@@ -243,7 +183,7 @@ Load pre-built scenarios in the EHR tab to instantly test different outcomes:
 Frontend:   HTML5, CSS3, Vanilla JavaScript
 AI Engine:  Rule-based NLP (v1) → Claude API (v2)
 Rules DB:   JSON (v1) → PostgreSQL (v2)
-Hosting:    GitHub Pages
+Hosting:    Custom Domail(if paid)
 ```
 
 ---
@@ -259,39 +199,9 @@ $127K   Annual Savings Per Provider
 
 ---
 
-## 🤝 Contributing
-
-Have ideas to improve AuthGuard? Found a bug?
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add YourFeature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a Pull Request
-
----
-
-## 📬 Contact & Collaboration
-
-Interested in:
-- 🏥 Piloting AuthGuard at your hospital or billing company
-- 🤝 Co-founding or joining the team
-- 💰 Investment or partnership discussions
-- 💬 General feedback on the prototype
-
-**Reach out via GitHub Issues or connect on LinkedIn.**
-
----
-
 ## ⚠️ Disclaimer
 
 AuthGuard Agent v1.0 is a **prototype** built for demonstration purposes. It does not constitute medical, legal, or financial advice. All patient data in the demo is fictional. Not HIPAA-compliant in current form. For production healthcare use, a compliant infrastructure is required.
-
----
-
-## 📄 License
-
-MIT License — free to use, modify, and distribute with attribution.
 
 ---
 
