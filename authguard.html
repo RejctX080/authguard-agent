@@ -297,7 +297,7 @@
             font-size: 0.9rem;
         }
 
-        /* What If Simulator */
+        /* Approval Path Optmizer */
         .whatif-card {
             background: rgba(102,126,234,0.1);
             border: 1px solid rgba(102,126,234,0.35);
@@ -903,7 +903,7 @@ Schedule elective left heart catheterization at outpatient center`
                 : "AI Confidence is LOW — notes may be unclear. Human review required before submitting.";
         } else if (probability >= 50) {
             action = "review"; message = "Add Documentation First";
-            recommendation = "Missing key requirements. Use the What If Simulator below to see exactly what to add.";
+            recommendation = "Missing key requirements. Use the Approval path optimizer below to see exactly what to add.";
         } else {
             action = "reject"; message = "High Denial Risk — Do Not Submit";
             recommendation = "Significant documentation gaps. Return to EHR, add missing items, then re-analyze.";
@@ -957,7 +957,7 @@ Schedule elective left heart catheterization at outpatient center`
             });
         }
 
-        // What If Simulator
+        // Approval path optmizer
         let whatIfHTML = '';
         if (result.whatIfSteps && result.whatIfSteps.length && result.probability < 99) {
             const steps = result.whatIfSteps.map((s, i) => `
@@ -972,7 +972,7 @@ Schedule elective left heart catheterization at outpatient center`
 
             whatIfHTML = `
                 <div class="whatif-card">
-                    <h3>🔮 What If Simulator</h3>
+                    <h3>🔮 Approval Path Optimizer</h3>
                     <div class="whatif-subtitle">Here's exactly what to add to improve your approval probability:</div>
                     ${steps}
                     <div class="whatif-final">
