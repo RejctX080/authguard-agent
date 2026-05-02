@@ -93,7 +93,7 @@ Catches facility-payer mismatches before submission:
 │              ↓                                      │
 │   4. Shows approval probability + AI confidence     │
 │              ↓                                      │
-│   5. Approval path optimizer shows how to improve         │
+│   5. Approval path optimizer shows how to improve   │
 │              ↓                                      │
 │   6. Smart button: Submit / Review / Block          │
 │              ↓                                      │
