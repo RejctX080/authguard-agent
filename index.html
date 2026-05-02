@@ -113,6 +113,118 @@
             transform: translateY(-1px);
         }
 
+        /* ── ROTATE OVERLAY ── */
+        #rotate-overlay {
+            position: fixed;
+            inset: 0;
+            background: #0a0a0f;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        #rotate-overlay.show {
+            display: flex;
+        }
+
+        .rotate-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: rotateAnim 2s ease-in-out infinite;
+            display: block;
+        }
+
+        @keyframes rotateAnim {
+            0%   { transform: rotate(0deg); }
+            30%  { transform: rotate(90deg); }
+            60%  { transform: rotate(90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .rotate-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .rotate-sub {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.6;
+            max-width: 280px;
+            margin-bottom: 2rem;
+        }
+
+        .rotate-skip {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6);
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rotate-skip:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        /* Force video to fill landscape properly */
+        #intro-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        /* On landscape mobile - fill screen */
+        @media (orientation: landscape) {
+            #intro-video {
+                object-fit: cover;
+            }
+        }
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.65rem 1.4rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: fadeInUp 1s ease 1.2s both;
+        }
+
+        .unmute-btn:hover {
+            background: rgba(255,255,255,0.28);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* Progress bar */
         .video-progress {
             position: fixed;
@@ -432,6 +544,19 @@
 </head>
 <body>
 
+    <!-- ════════════ ROTATE OVERLAY ════════════ -->
+    <div id="rotate-overlay">
+        <span class="rotate-icon">📱</span>
+        <div class="rotate-title">Rotate Your Phone</div>
+        <div class="rotate-sub">
+            This video is best experienced in landscape mode.
+            Please rotate your device horizontally.
+        </div>
+        <button class="rotate-skip" onclick="dismissRotate()">
+            Continue in Portrait →
+        </button>
+    </div>
+
     <!-- ════════════ VIDEO SCREEN ════════════ -->
     <div id="video-screen">
         <video
@@ -451,7 +576,7 @@
             <div class="no-video-title">AuthGuard Agent v1.0</div>
             <div class="no-video-sub">
                 AI-Powered Prior Authorization Guardrail<br>
-                for Healthcare RCM
+                for Healthcare Revenue Cycle Management
             </div>
         </div>
     </div>
@@ -459,6 +584,12 @@
     <!-- Skip button -->
     <button class="skip-btn" onclick="showLanding()">
         Skip Intro ›
+    </button>
+
+    <!-- Unmute button -->
+    <button class="unmute-btn" id="unmute-btn" onclick="toggleMute()">
+        <span id="unmute-icon">🔇</span>
+        <span id="unmute-text">Tap to Unmute</span>
     </button>
 
     <!-- Video progress bar -->
@@ -522,83 +653,9 @@
 
             <!-- CTA Button -->
             <div class="cta-wrap">
-                <a class="cta-btn" href="authguard.html">
+                <a class="cta-btn" href="authguard-complete.html">
                     ⚡ Experience in Reality
                     <span class="cta-arrow">→</span>
                 </a>
                 <div class="cta-sub">
-                    No login required · Works instantly
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Powered by -->
-    <div class="powered-by" id="powered-tag" style="display:none;">
-        AI-Powered Prior Authorization Intelligence
-    </div>
-
-    <script>
-        let landed = false;
-
-        // Auto-show landing if video fails to load
-        function showNoVideo() {
-            document.getElementById('no-video-fallback').style.display = 'flex';
-            setTimeout(showLanding, 4000);
-        }
-
-        // Update progress bar
-        function updateProgress() {
-            const video = document.getElementById('intro-video');
-            if (video.duration) {
-                const pct = (video.currentTime / video.duration) * 100;
-                document.getElementById('progress-bar').style.width = pct + '%';
-            }
-        }
-
-        // Show landing screen
-        function showLanding() {
-            if (landed) return;
-            landed = true;
-
-            const videoScreen = document.getElementById('video-screen');
-            const landingScreen = document.getElementById('landing-screen');
-            const skipBtn = document.querySelector('.skip-btn');
-            const progressBar = document.getElementById('progress-bar');
-            const poweredTag = document.getElementById('powered-tag');
-
-            // Pause video
-            const video = document.getElementById('intro-video');
-            if (video) video.pause();
-
-            // Fade out video
-            videoScreen.classList.add('fade-out');
-            skipBtn.style.display = 'none';
-            progressBar.style.width = '100%';
-
-            // Show landing
-            setTimeout(() => {
-                videoScreen.style.display = 'none';
-                landingScreen.classList.add('show');
-                poweredTag.style.display = 'block';
-            }, 1200);
-        }
-
-        // Keyboard shortcut: Space or Enter to skip
-        document.addEventListener('keydown', (e) => {
-            if ((e.code === 'Space' || e.code === 'Enter') && !landed) {
-                showLanding();
-            }
-        });
-
-        // If video doesn't start in 3s (no file), show fallback
-        setTimeout(() => {
-            const video = document.getElementById('intro-video');
-            if (video && video.readyState === 0 && !landed) {
-                showNoVideo();
-            }
-        }, 3000);
-    </script>
-</body>
-</html>
+                    No login required · Works instantly · No API key nee
