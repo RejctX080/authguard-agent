@@ -141,6 +141,7 @@ Load pre-built scenarios in the EHR tab to instantly test different outcomes:
 - [ ] Audit trail & logging
 - [ ] PDF export for appeal letters
 - [ ] Multi-user authentication
+- [ ] PROFESSTIONAL WEBSITE SHOWS AGENT DATA(PHI)
 
 ### Future (v3.0)
 - [ ] Epic FHIR API integration
@@ -149,6 +150,7 @@ Load pre-built scenarios in the EHR tab to instantly test different outcomes:
 - [ ] ML model trained on denial patterns
 - [ ] HIPAA-compliant infrastructure
 - [ ] Microsoft Teams "As Bot"
+- [ ] PROFESSTIONAL WEBSITE SHOWS AGENT DATA(PHI) 
 
 ---
 
